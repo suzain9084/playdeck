@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import logo from "/favicon.svg";
 import { QRCodeSVG } from 'qrcode.react';
 import { Maximize, Minimize } from 'lucide-react';
 import soundFile from '@/assets/entry_sound.mp3';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/lib/store';
-import { setIsFullScreen } from '@/lib/appState';
+import { toggleFullScreen } from '@/lib/utils';
 
 const PlayGame = () => {
     const sessionCode = "102 925";
@@ -13,27 +13,8 @@ const PlayGame = () => {
     const isFullScreen = useSelector((state: RootState) => state.appState.isFullScreen) as boolean;
     const dispatch = useDispatch<AppDispatch>();
 
-    const toggleFullScreen = () => {
-        if (!document.fullscreenEnabled) {
-            console.error("Fullscreen is not allowed by your browser or security settings.");
-            return;
-        }
-
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen()
-                .then(() => dispatch(setIsFullScreen(false)))
-                .catch((err) => {
-                    console.error(`Error: ${err.message}`);
-                });
-            dispatch(setIsFullScreen(false));
-        } else {
-            document.exitFullscreen();
-            dispatch(setIsFullScreen(true));
-        }
-    };
-
     useEffect(() => {
-        toggleFullScreen();
+        toggleFullScreen(dispatch);
         const audio = new Audio(soundFile);
         audio.play();
     }, []);
@@ -56,8 +37,8 @@ const PlayGame = () => {
                         <span className="font-mono text-[1.2rem] font-bold tracking-widest">{sessionCode}</span>
                     </div>
                     <button className="p-2 hover:bg-white/10 rounded-full transition-colors"
-                        onClick={toggleFullScreen}>
-                        {isFullScreen ? <Minimize className="w-6 h-6 text-gray-400" /> : <Maximize className="w-6 h-6 text-gray-400" />}
+                        onClick={() => toggleFullScreen(dispatch)}>
+                        {!isFullScreen ? <Minimize className="w-6 h-6 text-gray-400" /> : <Maximize className="w-6 h-6 text-gray-400" />}
                     </button>
                 </div>
             </header>

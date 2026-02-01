@@ -5,11 +5,12 @@ import heroDevices from "@/assets/hero-device.png";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
+import { cn } from "@/lib/utils";
 
 const HeroSection = () => {
   const isMobile = useSelector((state: RootState) => state.appState.isMobile) as boolean;
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden gradient-hero pt-40">
+    <section className={cn("relative min-h-screen flex items-center justify-center overflow-hidden gradient-hero", isMobile ? "pt-28" : "pt-40")}>
       {/* Background Effects */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse" />

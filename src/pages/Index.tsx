@@ -17,7 +17,7 @@ const Index = () => {
       <HowItWorks />
       <Platforms />
       <Benefits />
-      <Pricing />
+      {/* <Pricing /> */}
       <FAQ />
       <Footer />
     </div>

@@ -1,20 +1,15 @@
-import { AppDispatch, RootState } from "@/lib/store";
 import * as React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setIsMobile } from "@/lib/appState";
-const MOBILE_BREAKPOINT = 768;
 
 export function useIsMobile() {
-  const dispatch = useDispatch<AppDispatch>();
+  const [isMobile, setIsMobile] = React.useState<boolean>(false);
+
   React.useEffect(() => {
-    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
-    const onChange = () => {
-        dispatch(setIsMobile(window.innerWidth < MOBILE_BREAKPOINT));
-    };
-    mql.addEventListener("change", onChange);
-    dispatch(setIsMobile(window.innerWidth < MOBILE_BREAKPOINT));
-    return () => mql.removeEventListener("change", onChange);
+    const userAgent = window.navigator.userAgent;
+    const isAndroidPhone = /Android/i.test(userAgent) && /Mobi/i.test(userAgent);
+    const isIPhone = /iPhone/i.test(userAgent) && !/iPad/i.test(userAgent);
+    const isOtherPhone = /Windows Phone|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+    setIsMobile(isAndroidPhone || isIPhone || isOtherPhone);
   }, []);
 
-  return useSelector((state: RootState) => state.appState.isMobile) as boolean;
+  return isMobile;
 }

@@ -5,14 +5,14 @@ const Footer = () => {
   const footerLinks = {
     product: [
       { name: "Games", href: "#games" },
-      { name: "Pricing", href: "#pricing" },
+      // { name: "Pricing", href: "#pricing" },
       { name: "How it works", href: "#how-it-works" },
       { name: "FAQ", href: "#faq" },
     ],
     company: [
       { name: "About", href: "#" },
-      { name: "Blog", href: "#" },
-      { name: "Careers", href: "#" },
+      // { name: "Blog", href: "#" },
+      // { name: "Careers", href: "#" },
       { name: "Press", href: "#" },
     ],
     developers: [
@@ -100,7 +100,7 @@ const Footer = () => {
           </div>
 
           {/* Developers Links */}
-          <div>
+          {/* <div>
             <h4 className="font-semibold text-foreground mb-4">Developers</h4>
             <ul className="space-y-3">
               {footerLinks.developers.map((link) => (
@@ -114,7 +114,7 @@ const Footer = () => {
                 </li>
               ))}
             </ul>
-          </div>
+          </div> */}
 
           {/* Support Links */}
           <div>
@@ -131,27 +131,27 @@ const Footer = () => {
                 </li>
               ))}
             </ul>
-          </div>
+          </div> 
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} PlayDeck. All rights reserved.
-          </p>
-          <div className="flex gap-6 text-sm">
-            <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-              Privacy Policy
-            </a>
-            <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-              Terms of Service
-            </a>
-            <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-              Cookie Policy
-            </a>
+          {/* Bottom Bar */}
+          <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-muted-foreground text-sm">
+              © {new Date().getFullYear()} PlayDeck. All rights reserved.
+            </p>
+            <div className="flex gap-6 text-sm">
+              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+                Privacy Policy
+              </a>
+              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+                Terms of Service
+              </a>
+              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+                Cookie Policy
+              </a>
+            </div>
           </div>
         </div>
-      </div>
     </footer>
   );
 };
