@@ -38,7 +38,7 @@ const MobileCodeInput = () => {
     }, [currentStep, navigate])
 
     return (
-        <div className="min-h-screen bg-background text-white flex flex-col items-center justify-between px-6 py-8">
+        <div className="h-screen bg-background text-white flex flex-col items-center justify-between px-6 py-8">
             <div className="absolute top-0 left-0 text-white p-2 m-1" onClick={() => setCurrentStep(currentStep - 1)}><ArrowLeft className="w-8 h-8" /></div>
             {currentStep === 0 && <> <div className="flex flex-col items-center gap-6">
                 <div className="w-full max-w-xs bg-background rounded-xl p-4 flex items-center justify-center">

@@ -1,6 +1,6 @@
-node_modules/**/*
-dist/**/*
-dist-ssr/**/*
+frontend/node_modules/**/*
+/frontend/dist/**/*
+frontend/dist-ssr/**/*
 *.local
 .vscode/**/*
 .idea/**/*
@@ -13,3 +13,6 @@ dist-ssr/**/*
 .env.development.local
 .env.production.local
 .env.test.local
+
+
+/backend/**/**__pycache__**
