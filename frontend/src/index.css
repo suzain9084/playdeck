@@ -150,3 +150,7 @@
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--primary) / 0.7);
 }
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
