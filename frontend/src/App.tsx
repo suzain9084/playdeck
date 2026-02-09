@@ -10,7 +10,9 @@ import { useIsMobile } from "./hooks/use-mobile";
 import { useDispatch } from "react-redux";
 import { setIsMobile } from "./lib/appState";
 import { AppDispatch } from "./lib/store";
-import MobileCodeInput from "./pages/mobileCodeInput";
+import MobileCodeInput from "./pages/Mobile/mobileCodeInput";
+import GameList from "./pages/GameList";
+
 
 const queryClient = new QueryClient();
 
@@ -29,6 +31,7 @@ const App = () => {
           <Route path="/" element={<Index />} />
           <Route path="/playgames" element={isMobile ? <MobileCodeInput /> : <PlayGame />} />
           <Route path="*" element={<NotFound />} />
+          <Route path="/gamelist" element={<GameList />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
