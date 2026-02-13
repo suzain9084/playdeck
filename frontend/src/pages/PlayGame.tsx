@@ -22,7 +22,7 @@ const PlayGame = () => {
     return (
         <div className="flex flex-col h-screen overflow-auto font-sans text-white bg-background">
             {/* Top Navigation Bar */}
-            <header className="flex items-center justify-between px-6 py-2  bg-[#0f0f0f] border-b border-white/5">
+            <header className="flex items-center justify-between px-6 py-2  bg-background/80 border-b border-white/5">
                 <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center group-hover:scale-110 transition-transform">
                         <img src={logo} alt="PlayDeck" className="w-8 h-8" />

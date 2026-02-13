@@ -1,7 +1,6 @@
-import { ChevronLeft, ChevronRight, Flame, Heart, Trophy, Sparkles, Gamepad2 } from "lucide-react";
+import { Flame, Heart, Trophy, Sparkles, Gamepad2 } from "lucide-react";
 import { useRef } from "react";
 import GameCard from "./GameCard";
-import { Button } from "@/components/ui/button";
 
 interface Game {
   id: string;
@@ -40,37 +39,17 @@ const GameRow = ({ title, icon = "hot", games, onGameClick }: GameRowProps) => {
   return (
     <section className="py-4">
       {/* Section Header */}
-      <div className="flex items-center justify-between px-4 md:px-6 mb-4">
+      <div className="flex items-center justify-between px-4 mb-1">
         <div className="flex items-center gap-2">
           {iconMap[icon]}
           <h3 className="text-lg md:text-xl font-semibold text-foreground">{title}</h3>
         </div>
-
-        {/* Navigation arrows for larger screens */}
-        {/* <div className="hidden md:flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => scroll("left")}
-            className="h-8 w-8 rounded-full bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => scroll("right")}
-            className="h-8 w-8 rounded-full bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div> */}
       </div>
 
       {/* Games scroll container */}
       <div
         ref={scrollRef}
-        className="flex gap-3 md:gap-4 pt-8 overflow-x-auto scrollbar-hide pb-2 hide-scrollbar"
+        className="flex gap-3 pt-3.5 overflow-x-auto scrollbar-hide hide-scrollbar pb-3"
       >
         {games.map((game) => (
           <GameCard
