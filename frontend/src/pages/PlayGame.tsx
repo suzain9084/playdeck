@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import logo from "/favicon.svg";
 import { QRCodeSVG } from 'qrcode.react';
 import { Maximize, Minimize } from 'lucide-react';
@@ -6,18 +6,53 @@ import soundFile from '@/assets/entry_sound.mp3';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/lib/store';
 import { toggleFullScreen } from '@/lib/utils';
+import { setRoomId } from '@/lib/appState';
+import { toast } from 'sonner';
+import { useWebSocket } from '@/hooks/websockets';
 
 const PlayGame = () => {
-    const sessionCode = "102 925";
-    const joinUrl = `https://playdeck.com/join?code=${sessionCode.replace(/\s/g, '')}`;
-    const isFullScreen = useSelector((state: RootState) => state.appState.isFullScreen) as boolean;
+    const roomId = useSelector((state: RootState) => state.appState.roomId);
+    const socketId = useSelector((state: RootState) => state.appState.socketId);
+    const isFullScreen = useSelector((state: RootState) => state.appState.isFullScreen);
+    const socket = useWebSocket(roomId)
     const dispatch = useDispatch<AppDispatch>();
+
+    const fetch_room_id_code = useCallback(async () => {
+        if (roomId.trim() === "") {
+            try {
+                const res = await fetch("http://localhost:8000/get_room_id");
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.room_id) {
+                        dispatch(setRoomId(data.room_id));
+                    }
+                } else {
+                    toast.error("Failed to fetch room id")
+                    console.error("Failed to fetch room id:", res.statusText);
+                }
+            } catch (error) {
+                console.error("Error while fetching room id:", error);
+            }
+        }
+    }, [dispatch, roomId])
+
+    useEffect(() => {
+        fetch_room_id_code();
+    }, [fetch_room_id_code])
 
     useEffect(() => {
         toggleFullScreen(dispatch);
         const audio = new Audio(soundFile);
         audio.play();
-    }, []);
+    }, [dispatch]);
+
+    useEffect(() => {
+        return () => {
+            if (socket?.current) {
+                socket?.current.close();
+            }
+        };
+    }, [socket]);
 
     return (
         <div className="flex flex-col h-screen overflow-auto font-sans text-white bg-background">
@@ -34,7 +69,7 @@ const PlayGame = () => {
                     {/* Compact Session Ticket */}
                     <div className="bg-black border-2 border-blue-600/50 rounded-sm px-3 py-1 flex items-center space-x-6 shadow-[0_0_40px_rgba(37,99,235,0.2)]">
                         <span className="text-green-400 text-[1.2rem]">🎫</span>
-                        <span className="font-mono text-[1.2rem] font-bold tracking-widest">{sessionCode}</span>
+                        <span className="font-mono text-[1.2rem] font-bold tracking-widest">{roomId}</span>
                     </div>
                     <button className="p-2 hover:bg-white/10 rounded-full transition-colors"
                         onClick={() => toggleFullScreen(dispatch)}>
@@ -100,7 +135,7 @@ const PlayGame = () => {
                     <div className="bg-black border-2 border-blue-600/50 rounded-xl px-6 py-3 mb-6 flex items-center space-x-6 shadow-[0_0_40px_rgba(37,99,235,0.2)]">
                         <span className="text-2xl">🎫</span>
                         <span className="text-2xl font-black tracking-[0.2em] text-white tabular-nums">
-                            {sessionCode}
+                            {roomId}
                         </span>
                     </div>
 
@@ -112,12 +147,12 @@ const PlayGame = () => {
 
                     {/* Real QR Code */}
                     <div className="bg-white p-3 rounded-[1rem] shadow-2xl transition-transform hover:scale-105 duration-300">
-                        <QRCodeSVG
-                            value={joinUrl}
+                        {roomId && <QRCodeSVG
+                            value={`https://playdeck-beta.vercel.app/playgames?roomid=${roomId}`}
                             size={160}
                             level={"H"}
                             includeMargin={false}
-                        />
+                        />}
                     </div>
                 </div>
             </main>

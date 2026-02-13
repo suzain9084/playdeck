@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Check, HelpCircle, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ArrowLeft, Check, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -13,18 +14,13 @@ const MobileCodeInput = () => {
     const [currentStep, setCurrentStep] = useState(0);
     const [code, setCode] = useState("");
     const navigate = useNavigate();
+    const [name, setName] = useState("");
 
     useEffect(() => {
         if (currentStep === -1) {
             navigate("/");
         }
     }, [currentStep, navigate]);
-
-    const handleKeyPress = (val: string) => {
-        if (code.length < 6) {
-            setCode((prev) => prev + val);
-        }
-    };
 
     const clearCode = () => setCode("");
     const submitCode = () => {
@@ -40,7 +36,7 @@ const MobileCodeInput = () => {
     return (
         <div className="h-screen bg-background text-white flex flex-col items-center justify-between px-6 py-8">
             <div className="absolute top-0 left-0 text-white p-2 m-1" onClick={() => setCurrentStep(currentStep - 1)}><ArrowLeft className="w-8 h-8" /></div>
-            {currentStep === 0 && <> <div className="flex flex-col items-center gap-6">
+            {currentStep === 0 && <> <div className="flex flex-col items-center gap-6 h-screen w-full">
                 <div className="w-full max-w-xs bg-background rounded-xl p-4 flex items-center justify-center">
                     <div className="w-full h-40 bg-gray-600 rounded-md flex items-center justify-center text-sm text-gray-300">
                         Game Screen Illustration
@@ -55,7 +51,7 @@ const MobileCodeInput = () => {
                     {steps.map((step, index) => (
                         <div
                             key={index}
-                            className="flex items-start gap-4 justify-center"
+                            className="flex items-start gap-4 w-full"
                         >
                             <div className="text-3xl font-bold text-gray-100 w-6 self-center">
                                 {index + 1 + "."}
@@ -72,30 +68,24 @@ const MobileCodeInput = () => {
                 <Button variant="hero" size="xl" onClick={() => setCurrentStep(currentStep + 1)} >
                     I've got the connect code
                 </Button></>}
-            {currentStep === 1 && <>
-                <div className="w-full mb-12 mt-8">
-                    <div className="relative flex items-center justify-center gap-3 bg-background border-4 border-[#3b82f6] rounded-xl py-4 px-6 shadow-inner">
-                        <div className="absolute bottom-5 left-4 w-6 h-6 rounded-sm transform flex items-center justify-center self-center">
-                            <span className="text-green-400 text-[2.5rem] self-center">🎫</span>
+            {currentStep === 1 && <div className="relative h-screen w-full px-2">
+                <div className="w-full mb-12 mt-8 flex flex-col gap-5">
+                    <div className="flex flex-col justify-center gap-3 bg-background rounded-[1px]">
+                        <div className="rounded-[1px] transform">
+                            <span className="text-gray-200 text-[1.2rem]">Name*</span>
                         </div>
-                        <span className="text-2xl font-medium tracking-widest text-gray-100">
-                            {code || "Enter the code"}
-                        </span>
+                        <Input className="text-xl font-medium tracking-widest text-gray-100 h-16" value={name} placeholder="Enter the Name" />
+                    </div>
+                    <div className="flex flex-col justify-center gap-3 bg-background rounded-[1px]">
+                        <div className="rounded-[1px] transform">
+                            <span className="text-gray-200 text-[1.2rem]">Code*</span>
+                        </div>
+                        <Input className="text-xl font-medium tracking-widest text-gray-100 h-16" value={code} type="" placeholder="Enter the code" />
                     </div>
                 </div>
 
                 {/* Keypad Grid */}
-                <div className="grid grid-cols-3 gap-6 w-full px-4">
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-                        <button
-                            key={num}
-                            onClick={() => handleKeyPress(num.toString())}
-                            className="w-20 h-20 rounded-full bg-gray-800 text-3xl font-semibold flex items-center justify-center shadow-lg active:scale-90 active:bg-gray-700 transition-all"
-                        >
-                            {num}
-                        </button>
-                    ))}
-
+                <div className="absolute bottom-2 flex justify-between w-full px-4">
                     {/* Clear Button */}
                     <button
                         onClick={clearCode}
@@ -103,15 +93,6 @@ const MobileCodeInput = () => {
                     >
                         <X className="w-8 h-8 text-red-500 stroke-[3px]" />
                     </button>
-
-                    {/* Zero Button */}
-                    <button
-                        onClick={() => handleKeyPress("0")}
-                        className="w-20 h-20 rounded-full bg-gray-800 text-3xl font-semibold flex items-center justify-center shadow-lg active:scale-95 transition-all"
-                    >
-                        0
-                    </button>
-
                     {/* Confirm Button */}
                     <button
                         onClick={submitCode}
@@ -120,13 +101,7 @@ const MobileCodeInput = () => {
                         <Check className="w-10 h-10 text-green-500 stroke-[3px]" />
                     </button>
                 </div>
-
-                {/* Footer Link */}
-                <button className="mt-6 flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
-                    <HelpCircle className="w-5 h-5" />
-                    <span className="text-sm text-gray-100 hover:text-white transition-colors font-medium">How to get the connect code?</span>
-                </button>
-            </>}
+            </div>}
         </div>
     );
 };

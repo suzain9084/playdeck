@@ -2,6 +2,7 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { setIsFullScreen } from "./appState";
 import { AppDispatch } from "./store";
+import { toast } from "sonner";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -15,7 +16,9 @@ export const toggleFullScreen = (dispatch: AppDispatch) => {
 
   if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen()
-          .then(() => dispatch(setIsFullScreen(false)))
+          .then(() => {
+            dispatch(setIsFullScreen(false));
+           })
           .catch((err) => {
               console.error(`Error: ${err.message}`);
           });

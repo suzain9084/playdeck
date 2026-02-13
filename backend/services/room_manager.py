@@ -26,7 +26,6 @@ class RoomManager:
         self.locked_room_ids: Set[Tuple[str, float]] = set()
 
     async def connect(self, room_id: str, websocket: WebSocket, name: str):
-
         await websocket.accept()
 
         if room_id not in self.rooms:
@@ -69,7 +68,6 @@ class RoomManager:
             self.lock_room(room_id)
 
     async def broadcast(self, room_id: str, message: str):
-
         room = self.rooms.get(room_id)
         if not room:
             return
