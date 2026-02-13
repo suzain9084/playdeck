@@ -11,6 +11,9 @@ import game5 from "@/assets/game-5.jpg";
 import game6 from "@/assets/game-6.jpg";
 import game7 from "@/assets/game-7.jpg";
 import game8 from "@/assets/game-8.jpg";
+import { useEffect } from "react";
+import { toggleFullScreen } from "@/lib/utils";
+import { useDispatch } from "react-redux";
 
 const hotAndFreeGames = [
     { id: "1", title: "Kart Racing", image: game1 },
@@ -61,6 +64,8 @@ const familyGames = [
 ];
 
 const GameList = () => {
+    const dispatch = useDispatch();
+
     const handleGameClick = (gameId: string) => {
         console.log("Game clicked:", gameId);
     };
@@ -68,6 +73,10 @@ const GameList = () => {
     const handlePlayFeatured = () => {
         console.log("Play featured game");
     };
+
+    useEffect(() => {
+        toggleFullScreen(dispatch);
+    }, [dispatch])
 
     return (
         <div className="min-h-screen bg-background">
@@ -86,7 +95,7 @@ const GameList = () => {
             </div>
             {/* Game Rows */}
             <div className="w-full space-y-2 px-9">
-                <div className="pb-2 space-y-2 ">
+                <div className="pb-2 space-y-2">
                     <GameRow
                         title="Hot & Free"
                         icon="hot"

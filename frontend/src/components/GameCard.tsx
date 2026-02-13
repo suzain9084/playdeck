@@ -25,8 +25,8 @@ const GameCard = ({
     <button
       onClick={onClick}
       className={cn(
-        "group relative flex-shrink-0 rounded-xl overflow-hidden transition-all duration-300 ",
-        "hover:scale-105 hover:shadow-2xl hover:z-10",
+        "group relative flex-shrink-0 rounded-xl overflow-hidden transition-all duration-300 ml-3.5",
+        "hover:scale-110 hover:shadow-2xl hover:z-10 ",
         "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background",
         sizeClasses[size],
         className
