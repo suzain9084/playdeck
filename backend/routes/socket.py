@@ -12,7 +12,7 @@ router = APIRouter()
 async def websocket_room(websocket: WebSocket, room_id: str, name: str):
     await manager.connect(room_id, websocket, name)
     try:
-        await manager.broadcast(room_id, f"{name} joined the room")
+        await manager.connectBroadcast(room_id, name)
         while True:
             data = await websocket.receive_text()
             await manager.broadcast(room_id, data)
