@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { ArrowLeft, Check, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import CommanRemote from "./commanRemote";
 
 const steps = [
     "Connect all the devices to the same WiFi",
@@ -24,7 +25,8 @@ const MobileCodeInput = () => {
 
     const clearCode = () => setCode("");
     const submitCode = () => {
-        console.log("Submitting code:", code);
+        setCurrentStep((prev) => prev+1);
+        // console.log("Submitting code:", code);
     };
 
     useEffect(() => {
@@ -102,6 +104,7 @@ const MobileCodeInput = () => {
                     </button>
                 </div>
             </div>}
+            {currentStep === 2 && <CommanRemote/>}
         </div>
     );
 };

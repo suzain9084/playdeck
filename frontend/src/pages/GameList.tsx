@@ -67,11 +67,11 @@ const GameList = () => {
     const dispatch = useDispatch();
 
     const handleGameClick = (gameId: string) => {
-        console.log("Game clicked:", gameId);
+        // console.log("Game clicked:", gameId);
     };
 
     const handlePlayFeatured = () => {
-        console.log("Play featured game");
+        // console.log("Play featured game");
     };
 
     useEffect(() => {

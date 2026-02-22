@@ -9,12 +9,13 @@ import { toggleFullScreen } from '@/lib/utils';
 import { setRoomId } from '@/lib/appState';
 import { toast } from 'sonner';
 import { useWebSocket } from '@/hooks/websockets';
+import GameList from './GameList';
 
 const PlayGame = () => {
     const roomId = useSelector((state: RootState) => state.appState.roomId);
-    const socketId = useSelector((state: RootState) => state.appState.socketId);
+    const players = useSelector((state: RootState) => state.appState.players);
     const isFullScreen = useSelector((state: RootState) => state.appState.isFullScreen);
-    const socket = useWebSocket(roomId)
+    const socket = useWebSocket(roomId, "screen")
     const dispatch = useDispatch<AppDispatch>();
 
     const fetch_room_id_code = useCallback(async () => {
@@ -54,9 +55,12 @@ const PlayGame = () => {
         };
     }, [socket]);
 
+    if (players.length !== 0) {
+        return <GameList/>
+    }
+
     return (
         <div className="flex flex-col h-screen overflow-auto font-sans text-white bg-background">
-            {/* Top Navigation Bar */}
             <header className="flex items-center justify-between px-6 py-2  bg-background/80 border-b border-white/5">
                 <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -66,7 +70,6 @@ const PlayGame = () => {
                 </div>
 
                 <div className="flex items-center space-x-6">
-                    {/* Compact Session Ticket */}
                     <div className="bg-black border-2 border-blue-600/50 rounded-sm px-3 py-1 flex items-center space-x-6 shadow-[0_0_40px_rgba(37,99,235,0.2)]">
                         <span className="text-green-400 text-[1.2rem]">🎫</span>
                         <span className="font-mono text-[1.2rem] font-bold tracking-widest">{roomId}</span>
@@ -78,16 +81,12 @@ const PlayGame = () => {
                 </div>
             </header>
 
-            {/* Main Content Area */}
             <main className="flex flex-1 flex-col md:flex-row h-full">
 
-                {/* Left Section: Hero Visuals */}
                 <div className="flex-1 bg-gradient-to-br from-blue-600 to-blue-800 flex flex-col items-center justify-center p-8 space-y-12 relative overflow-hidden h-full">
-                    {/* Decorative background glow */}
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/10 blur-[120px] rounded-full" />
 
                     <div className="relative w-full max-w-lg z-10">
-                        {/* Main Game Preview */}
                         <div className="bg-black rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-8 border-gray-900/50">
                             <img
                                 src="/path-to-your-game-preview.jpg"
@@ -96,7 +95,6 @@ const PlayGame = () => {
                             />
                         </div>
 
-                        {/* Floating Controllers */}
                         <div className="flex justify-between mt-8 px-6">
                             <div className="w-32 bg-gray-900 rounded-xl border-2 border-white/10 p-2 shadow-2xl transform -rotate-3 hover:rotate-0 transition-transform duration-500">
                                 <div className="bg-cyan-950 h-14 rounded-lg border border-cyan-400/30 flex items-center justify-center">
@@ -116,7 +114,6 @@ const PlayGame = () => {
                     </p>
                 </div>
 
-                {/* Right Section: Connection Steps */}
                 <div className="flex-1 bg-background flex flex-col items-center justify-evenly p-12 text-center border-l border-white/5">
                     <h1 className="text-4xl md:text-5xl font-black leading-tight mb-5">
                         Connect your phones <br /> as controllers
@@ -131,7 +128,6 @@ const PlayGame = () => {
                         </p>
                     </div>
 
-                    {/* Giant Code Display */}
                     <div className="bg-black border-2 border-blue-600/50 rounded-xl px-6 py-3 mb-6 flex items-center space-x-6 shadow-[0_0_40px_rgba(37,99,235,0.2)]">
                         <span className="text-2xl">🎫</span>
                         <span className="text-2xl font-black tracking-[0.2em] text-white tabular-nums">
@@ -145,7 +141,6 @@ const PlayGame = () => {
                         <div className="h-px bg-white/10 flex-1"></div>
                     </div>
 
-                    {/* Real QR Code */}
                     <div className="bg-white p-3 rounded-[1rem] shadow-2xl transition-transform hover:scale-105 duration-300">
                         {roomId && <QRCodeSVG
                             value={`https://playdeck-beta.vercel.app/playgames?roomid=${roomId}`}

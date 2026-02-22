@@ -1,8 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { setIsFullScreen } from "./appState";
 import { AppDispatch } from "./store";
-import { toast } from "sonner";
+import { setIsFullScreen } from "./appState";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
