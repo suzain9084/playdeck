@@ -11,7 +11,7 @@ import game5 from "@/assets/game-5.jpg";
 import game6 from "@/assets/game-6.jpg";
 import game7 from "@/assets/game-7.jpg";
 import game8 from "@/assets/game-8.jpg";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toggleFullScreen } from "@/lib/utils";
 import { useDispatch } from "react-redux";
 
@@ -64,6 +64,55 @@ const familyGames = [
 ];
 
 const GameList = () => {
+    const [activeRow, setActiveRow] = useState<number>(0);
+    const [activeCol, setActiveCol] = useState<number>(0);
+    const gameContainersRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            setActiveRow((prevRow) => {
+                let newRow = prevRow;
+                let newCol = activeCol;
+
+                if (e.key === "ArrowDown") {
+                    newRow = Math.min(prevRow + 1, 3);
+                }
+
+                if (e.key === "ArrowUp") {
+                    newRow = Math.max(prevRow - 1, 0);
+                }
+
+                if (e.key === "ArrowRight") {
+                    setActiveCol((prev) =>
+                        (prev + 1) % rowLengths[activeRow]
+                    );
+                }
+
+                if (e.key === "ArrowLeft") {
+                    setActiveCol((prev) => Math.max(prev - 1, 0));
+                    return prevRow;
+                }
+
+                return newRow;
+            });
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [activeCol]);
+
+    useEffect(() => {
+        const selected = document.querySelector(".selected-game") as HTMLElement;
+
+        if (selected) {
+            selected.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+                inline: "center",
+            });
+        }
+    }, [activeRow, activeCol]);
+
     const dispatch = useDispatch();
 
     const handleGameClick = (gameId: string) => {
@@ -78,12 +127,19 @@ const GameList = () => {
         toggleFullScreen(dispatch);
     }, [dispatch])
 
+    const rowLengths = [
+        hotAndFreeGames.length,
+        newGames.length,
+        topCharts.length,
+        familyGames.length,
+    ];
+
     return (
-        <div className="min-h-screen bg-background">
+        <div className="h-screen flex flex-col bg-background">
             <GameHeader />
 
             {/* Featured Game */}
-           <div className="sticky top-16 w-full py-4 z-40 bg-background px-9">
+            <div className="flex-shrink-0 w-full py-4 bg-background px-9">
                 <FeaturedGame
                     title="Burnin' Rubber 5 Air"
                     description="Combative car racing with explosives! Battle your fellow players in a fast paced race while slowdown opponents with rockets, mines and more!"
@@ -94,34 +150,42 @@ const GameList = () => {
                 />
             </div>
             {/* Game Rows */}
-            <div className="w-full space-y-2 px-9">
-                <div className="pb-2 space-y-2">
+            <div className="flex-1 overflow-hidden w-full scrollbar-hide space-y-2 px-9">
+                <div className="pb-2 space-y-2" ref={gameContainersRef}>
                     <GameRow
+                        rowIndex={0}
                         title="Hot & Free"
                         icon="hot"
                         games={hotAndFreeGames}
                         onGameClick={handleGameClick}
+                        selectedGame={activeRow === 0 ? activeCol : null}
                     />
 
                     <GameRow
+                        rowIndex={1}
                         title="New"
                         icon="new"
                         games={newGames}
                         onGameClick={handleGameClick}
+                        selectedGame={activeRow === 1 ? activeCol : null}
                     />
 
                     <GameRow
+                        rowIndex={2}
                         title="Top Charts"
                         icon="top"
                         games={topCharts}
                         onGameClick={handleGameClick}
+                        selectedGame={activeRow === 2 ? activeCol : null}
                     />
 
                     <GameRow
+                        rowIndex={3}
                         title="Kids & Family"
                         icon="family"
                         games={familyGames}
                         onGameClick={handleGameClick}
+                        selectedGame={activeRow === 3 ? activeCol : null}
                     />
                 </div>
             </div>

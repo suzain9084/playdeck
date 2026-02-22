@@ -12,7 +12,9 @@ interface GameRowProps {
   title: string;
   icon?: "hot" | "favorites" | "new" | "top" | "family";
   games: Game[];
+  rowIndex: number;
   onGameClick?: (gameId: string) => void;
+  selectedGame?: number | null;
 }
 
 const iconMap = {
@@ -23,7 +25,7 @@ const iconMap = {
   family: <Gamepad2 className="h-5 w-5 text-gaming-green" />,
 };
 
-const GameRow = ({ title, icon = "hot", games, onGameClick }: GameRowProps) => {
+const GameRow = ({ title, icon = "hot", games, rowIndex, onGameClick, selectedGame }: GameRowProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: "left" | "right") => {
@@ -49,14 +51,19 @@ const GameRow = ({ title, icon = "hot", games, onGameClick }: GameRowProps) => {
       {/* Games scroll container */}
       <div
         ref={scrollRef}
-        className="flex gap-3 pt-3.5 overflow-x-auto scrollbar-hide hide-scrollbar pb-3"
+        className="flex gap-3 pt-3.5 overflow-hidden scrollbar-hide hide-scrollbar pb-3 pr-10"
       >
-        {games.map((game) => (
+        {games.map((game, colIndex) => (
           <GameCard
-            key={game.id}
+            key={colIndex}
+            index={colIndex}
             title={game.title}
             image={game.image}
             onClick={() => onGameClick?.(game.id)}
+            className={`${selectedGame === colIndex ? "ring-4 ring-primary selected-game scale-110 shadow-2xl z-10" : ""}`}
+            data-row={rowIndex}
+            data-col={colIndex}
+            selectedGame={selectedGame}
           />
         ))}
       </div>
