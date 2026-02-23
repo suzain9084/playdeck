@@ -12,7 +12,7 @@ export const toggleFullScreen = (dispatch: AppDispatch) => {
       console.error("Fullscreen is not allowed by your browser or security settings.");
       return;
   }
-
+  
   if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen()
           .then(() => {
