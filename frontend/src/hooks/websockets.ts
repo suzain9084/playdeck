@@ -11,15 +11,14 @@ export const useWebSocket = (roomId, name) => {
         const data = JSON.parse(event.data);
         if (data.event === "connect") {
             if (data.name === "screen") {
-                console.log(data);
                 dispatch(setName(event.name));
                 dispatch(setSocketId(event.socket_id));
                 dispatch(setScreenId(event.socket_id));
                 dispatch(setRole("screen"));
                 dispatch(setConnectionStatus("connected"))
                 dispatch(setGamePhase("starting"));
+                toast.message("Screen Connect with Server.");
             } else if (event.name !== name) {
-                console.log(data);
                 dispatch(addPlayer({
                     name: event.name,
                     socketId: event.socket_id,
@@ -27,8 +26,8 @@ export const useWebSocket = (roomId, name) => {
                     connected: true,
                     isHost: event.socket_id === event.host_socket_id,
                 }));
+                toast.message(`${name} is connected with Screen`);
             } else {
-                console.log(data);
                 dispatch(setConnectionStatus("connected"));
                 dispatch(setGamePhase("lobby"));
                 const players: Player[] = [];
@@ -51,7 +50,7 @@ export const useWebSocket = (roomId, name) => {
     }, [dispatch, name])
 
     useEffect(() => {
-        if (!roomId) return;
+        if (!roomId || !name) return;
         let ws: WebSocket
         try {
             ws = new WebSocket(`ws://localhost:8000/ws/${roomId}/${name}`);

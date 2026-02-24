@@ -1,18 +1,16 @@
 import { Smartphone, Gamepad2, Maximize, Minimize } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback, AvatarGroup } from "./ui/avatar";
-import { toggleFullScreen } from "@/lib/utils";
+import { getInitials, stringToColor, toggleFullScreen } from "@/lib/utils";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 import logo from "/logo.png"
 
-interface GameHeaderProps {
-  sessionCode?: string;
-}
-
-const GameHeader = ({ sessionCode = "102 318 7" }: GameHeaderProps) => {
+const GameHeader = () => {
   const dispatch = useDispatch();
   const isFullScreen = useSelector((state: RootState) => state.appState.isFullScreen);
+  const players = useSelector((state: RootState) => state.appState.players);
+  const roomId = useSelector((state: RootState) => state.appState.roomId);
 
   return (
     <header className="sticky top-0 z-50 px-6 w-full border-b border-border/40 bg-background/80 gradient-hero supports-[backdrop-filter]:bg-background/60">
@@ -29,21 +27,22 @@ const GameHeader = ({ sessionCode = "102 318 7" }: GameHeaderProps) => {
         <div className="flex items-center gap-3">
           {/* User avatar placeholder */}
           <AvatarGroup className="grayscale">
-            <Avatar>
-              <AvatarImage src="" alt="@shadcn" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-            <Avatar>
-              <AvatarImage src="" alt="@maxleiter" />
-              <AvatarFallback>LR</AvatarFallback>
-            </Avatar>
-            <Avatar>
-              <AvatarImage
-                src=""
-                alt="@evilrabbit"
-              />
-              <AvatarFallback>ER</AvatarFallback>
-            </Avatar>
+            {players.map((item) => {
+              const initials = getInitials(item.name);
+              const bgColor = stringToColor(item.name);
+
+              return (
+                <Avatar key={item.name} className="h-9 w-9">
+                  <AvatarImage src=""> </AvatarImage>
+                  <AvatarFallback
+                    className="flex h-full w-full items-center justify-center rounded-full text-sm font-semibold text-white"
+                    style={{ backgroundColor: bgColor }}
+                  >
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+              );
+            })}
           </AvatarGroup>
 
           {/* Add more phones button */}
@@ -52,13 +51,13 @@ const GameHeader = ({ sessionCode = "102 318 7" }: GameHeaderProps) => {
             className="hidden sm:flex items-center gap-2 border-gaming-green/50 text-gaming-green hover:bg-gaming-green/10 hover:text-gaming-green rounded-sm"
           >
             <Smartphone className="h-4 w-4" />
-            Add more phones
+            Add more players
           </Button>
 
           {/* Session code */}
           <div className="flex items-center gap-2 rounded-sm bg-muted px-3 py-2">
             <span className="text-gaming-green text-lg">🎫</span>
-            <span className="font-mono font-bold text-foreground tracking-wide">{sessionCode}</span>
+            <span className="font-mono font-bold text-foreground tracking-wide">{roomId}</span>
           </div>
 
           {/* Fullscreen button */}

@@ -13,7 +13,8 @@ import game7 from "@/assets/game-7.jpg";
 import game8 from "@/assets/game-8.jpg";
 import { useEffect, useRef, useState } from "react";
 import { toggleFullScreen } from "@/lib/utils";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/lib/store";
 
 const hotAndFreeGames = [
     { id: "1", title: "Kart Racing", image: game1 },

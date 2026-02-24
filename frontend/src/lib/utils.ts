@@ -27,3 +27,26 @@ export const toggleFullScreen = (dispatch: AppDispatch) => {
       dispatch(setIsFullScreen(true));
   }
 };
+
+export const getInitials = (name = "") => {
+  const parts = name.trim().split(" ");
+
+  if (parts.length === 1) {
+    return parts[0][0]?.toUpperCase();
+  }
+
+  return (
+    (parts[0][0] || "") +
+    (parts[1][0] || "")
+  ).toUpperCase();
+};
+
+export const stringToColor = (str = "") => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  const hue = hash % 360;
+  return `hsl(${hue}, 60%, 60%)`;
+};

@@ -1,9 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Check, X } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CommanRemote from "./commanRemote";
+import { toast } from "sonner";
+import { useWebSocket } from "@/hooks/websockets";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/lib/store";
+import { setConnectionStatus, setName, setRoomId } from "@/lib/appState";
 
 const steps = [
     "Connect all the devices to the same WiFi",
@@ -15,25 +20,45 @@ const MobileCodeInput = () => {
     const [currentStep, setCurrentStep] = useState(0);
     const [code, setCode] = useState("");
     const navigate = useNavigate();
-    const [name, setName] = useState("");
+    const [nameState, setNameState] = useState("");
+    const [submited, setSubmited] = useState(false);
+    const dispatch = useDispatch<AppDispatch>();
+    const connectionStatus = useSelector((state: RootState) => state.appState.connectionStatus);
+    const socket = useWebSocket(submited ? code : "", submited ? nameState : "");
 
     useEffect(() => {
         if (currentStep === -1) {
             navigate("/");
         }
-    }, [currentStep, navigate]);
+    }, [currentStep, navigate, connectionStatus]);
 
     const clearCode = () => setCode("");
-    const submitCode = () => {
-        setCurrentStep((prev) => prev+1);
-        // console.log("Submitting code:", code);
-    };
+    const submitCode = useCallback(() => {
+        if (nameState.trim() === "" || code.trim() === "") {
+            toast.error("Please enter a name and code");
+            return;
+        }
+        setSubmited(true);
+    }, [code, nameState]);
 
     useEffect(() => {
-        if (currentStep === -1) {
-            navigate("/");
+        if (submited) {
+            if (socket.current) {
+                dispatch(setRoomId(code));
+                dispatch(setName(nameState));
+                dispatch(setConnectionStatus("connected"));
+                toast.message("Connected to the Screen. Let's play");
+            } else {
+                setSubmited(false);
+                toast.error("Failed to connect to server");
+                console.error("Failed to connect to server");
+            }
         }
-    }, [currentStep, navigate])
+    }, [socket, dispatch, code, nameState, submited])
+
+    if (connectionStatus === "connected") {
+        return <CommanRemote />
+    }
 
     return (
         <div className="h-screen bg-background text-white flex flex-col items-center justify-between px-6 py-8">
@@ -76,13 +101,13 @@ const MobileCodeInput = () => {
                         <div className="rounded-[1px] transform">
                             <span className="text-gray-200 text-[1.2rem]">Name*</span>
                         </div>
-                        <Input className="text-xl font-medium tracking-widest text-gray-100 h-16" value={name} placeholder="Enter the Name" />
+                        <Input className="text-xl font-medium tracking-widest text-gray-100 h-16" value={nameState} placeholder="Enter the Name" onChange={(e) => setNameState(e.target.value)} />
                     </div>
                     <div className="flex flex-col justify-center gap-3 bg-background rounded-[1px]">
                         <div className="rounded-[1px] transform">
                             <span className="text-gray-200 text-[1.2rem]">Code*</span>
                         </div>
-                        <Input className="text-xl font-medium tracking-widest text-gray-100 h-16" value={code} type="" placeholder="Enter the code" />
+                        <Input className="text-xl font-medium tracking-widest text-gray-100 h-16" value={code} type="" placeholder="Enter the code" onChange={(e) => setCode(e.target.value)} />
                     </div>
                 </div>
 
@@ -104,7 +129,6 @@ const MobileCodeInput = () => {
                     </button>
                 </div>
             </div>}
-            {currentStep === 2 && <CommanRemote/>}
         </div>
     );
 };
