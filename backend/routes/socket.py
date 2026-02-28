@@ -1,25 +1,28 @@
+import socket
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from services.room_manager import manager
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from services.room_manager import manager
+from datetime import datetime
 
 router = APIRouter()
 
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from services.room_manager import manager
 
 router = APIRouter()
 
 @router.websocket("/ws/{room_id}/{name}")
 async def websocket_room(websocket: WebSocket, room_id: str, name: str):
-    await manager.connect(room_id, websocket, name)
+    socket_id = datetime.utcnow().strftime("%Y%m%d%H%M%S%f")
     try:
-        await manager.connectBroadcast(room_id, name)
+        await manager.connect(room_id, websocket, name, socket_id)
+        await manager.connectBroadcast(room_id, name, socket_id)
         while True:
             data = await websocket.receive_text()
-            await manager.broadcast(room_id, data)
+            await manager.read_message_reply(data)
 
     except WebSocketDisconnect:
         manager.disconnect(room_id, websocket)
-        await manager.broadcast(room_id, f"{name} left the room")
+        await manager.broadcast(room_id, {"event": "disconnect", "socket_id": socket_id, "name": name})
 
     except Exception as e:
         await manager.disconnect(room_id, websocket)

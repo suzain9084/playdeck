@@ -23,10 +23,6 @@ import { useEffect } from "react";
       large: "w-44 h-44 sm:w-52 sm:h-52",
     };
 
-    useEffect(() => {
-      console.log("Selected Game:", selectedGame);
-    },[selectedGame])
-
     return (
       <button
         {...props}

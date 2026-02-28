@@ -1,18 +1,10 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice } from "@reduxjs/toolkit";
 
 export type DeviceRole = "screen" | "controller";
 
-export type ConnectionStatus =
-  | "disconnected"
-  | "connecting"
-  | "connected";
+export type ConnectionStatus = "disconnected" | "connecting" | "connected";
 
-export type GamePhase =
-  | "idle"
-  | "lobby"
-  | "starting"
-  | "playing"
-  | "ended";
+export type GamePhase = "lobby" | "playing" | "ended";
 
 export interface Player {
   name: string;
@@ -33,10 +25,12 @@ export interface AppStateType {
   name: string;
   players: Player[];
   gamePhase: GamePhase;
+  selectedRow: number;
+  selectedCol: number;
 }
 
 export const AppStateSlice = createSlice({
-  name: 'appState',
+  name: "appState",
   initialState: {
     role: "controller",
     isMobile: false,
@@ -46,7 +40,9 @@ export const AppStateSlice = createSlice({
     roomId: "",
     name: "",
     players: [],
-    gamePhase: "idle"
+    gamePhase: "lobby",
+    selectedCol: 0,
+    selectedRow: 0,
   } as AppStateType,
   reducers: {
     setIsMobile: (state, action) => {
@@ -56,7 +52,7 @@ export const AppStateSlice = createSlice({
     setRole: (state, action) => {
       state.role = action.payload;
     },
-    
+
     setIsFullScreen: (state, action) => {
       state.isFullScreen = action.payload;
     },
@@ -64,42 +60,65 @@ export const AppStateSlice = createSlice({
     setConnectionStatus: (state, action) => {
       state.connectionStatus = action.payload;
     },
-  
+
     setSocketId: (state, action) => {
       state.socketId = action.payload;
     },
-  
+
     setRoomId: (state, action) => {
       state.roomId = action.payload;
     },
-  
+
     setName: (state, action) => {
       state.name = action.payload;
     },
-  
+
     setGamePhase: (state, action) => {
       state.gamePhase = action.payload;
     },
-  
+
     setPlayers: (state, action) => {
       state.players = action.payload;
     },
-  
+
     addPlayer: (state, action) => {
       state.players.push(action.payload);
     },
-  
+
     removePlayer: (state, action) => {
       state.players = state.players.filter(
-        p => p.socketId !== action.payload
+        (p) => p.socketId === action.payload,
       );
     },
 
     setScreenId: (state, action) => {
       state.screenId = action.payload;
     },
-  }
-})
 
-export const {setIsMobile, setRole, setConnectionStatus, setIsFullScreen, setSocketId, setRoomId, setName, setGamePhase, setPlayers, addPlayer, removePlayer, setScreenId} = AppStateSlice.actions
-export default AppStateSlice.reducer
+    setSelectedRow: (state, action) => {
+      state.selectedRow = action.payload;
+    },
+
+    setSelectedCol: (state, action) => {
+      state.selectedCol = action.payload;
+    },
+  },
+});
+
+export const {
+  setIsMobile,
+  setRole,
+  setConnectionStatus,
+  setIsFullScreen,
+  setSocketId,
+  setRoomId,
+  setName,
+  setGamePhase,
+  setPlayers,
+  addPlayer,
+  removePlayer,
+  setScreenId,
+  setSelectedCol,
+  setSelectedRow,
+} = AppStateSlice.actions;
+export default AppStateSlice.reducer;

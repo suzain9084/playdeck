@@ -1,3 +1,4 @@
+from ctypes import memmove
 import socket
 import string
 from fastapi import WebSocket
@@ -5,7 +6,7 @@ from typing import Dict, Set, Tuple, List, Optional
 from time import time
 from dataclasses import dataclass
 import uuid
-from datetime import datetime
+import json
 
 @dataclass
 class Member:
@@ -34,9 +35,8 @@ class RoomManager:
         self.rooms: Dict[str, Room] = {}
         self.locked_room_ids: Set[Tuple[str, float]] = set()
 
-    async def connect(self, room_id: str, websocket: WebSocket, name: str):
+    async def connect(self, room_id: str, websocket: WebSocket, name: str, socket_id: str):
         await websocket.accept()
-        socket_id = datetime.utcnow().strftime("%Y%m%d%H%M%S%f")
 
         if room_id not in self.rooms:
             room = Room(room_id)
@@ -77,24 +77,42 @@ class RoomManager:
             del self.rooms[room_id]
             self.lock_room(room_id)
 
-    async def connectBroadcast(self, room_id: str, name: str):
+    async def connectBroadcast(self, room_id: str, name: str, socket_id: str):
         room = self.rooms.get(room_id)
         if not room:
             return
 
-        if name == "screen":
+        if len(room.members) == 1:
             await room.members[0].websocket.send_json({"event": "connect", "name": name, "socket_id": room.members[0].socket_id})
             return
 
         for member in room.members:
             if member.name != name:
-                await member.websocket.send_json({"event": "connect", "name": name, "socket_id": member.socket_id})
+                await member.websocket.send_json({"event": "connect", "name": name, "socket_id": socket_id})
             else:
                 await member.websocket.send_json({
                     "event": "room_state",
                     "members": [m.to_dict() for m in room.members],
                     "host_socket_id": room.host.socket_id if room.host else None,
                 })
+
+    async def read_message_reply(self, data):
+        data = json.loads(data)
+        if data["event"] == "button_press":
+            msg_from = data["from"]
+            msg_to = data["to"]
+            action = data["action"]
+            room_id = data["room_id"]
+            for member in self.rooms[room_id].members:
+                if msg_to == member.socket_id:
+                    await member.websocket.send_json({"event": data["event"], "from": msg_from, "action": action})
+                    break
+
+    async def broadcast(self, room_id, message):
+        if room_id not in self.rooms.keys():
+            return
+        for memeber in self.rooms[room_id].members:
+            await memeber.websocket.send_json(message)
 
     def generate_new_room_id(self) -> str:
         self.clean_locked_room()
@@ -114,5 +132,7 @@ class RoomManager:
         self.locked_room_ids = {
             (rid, expiry) for rid, expiry in self.locked_room_ids if expiry > now
         }
+
+    
 
 manager = RoomManager()

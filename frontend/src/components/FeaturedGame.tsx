@@ -8,7 +8,6 @@ interface FeaturedGameProps {
   rating: number;
   playerCount: string;
   tags?: string[];
-  onPlay?: () => void;
   compact?: boolean;
 }
 
@@ -19,7 +18,6 @@ const FeaturedGame = ({
   rating = 5,
   playerCount = "1-4",
   tags = [],
-  onPlay,
   compact = false,
 }: FeaturedGameProps) => {
   return (
@@ -78,7 +76,7 @@ const FeaturedGame = ({
             )}
 
             <Button
-              onClick={onPlay}
+              // onClick={onPlay}
               className="gradient-primary text-primary-foreground glow-primary hover:opacity-90 transition-opacity"
               size="lg"
             >

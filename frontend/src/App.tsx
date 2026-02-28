@@ -11,6 +11,7 @@ import { useDispatch } from "react-redux";
 import { setIsMobile } from "./lib/appState";
 import { AppDispatch } from "./lib/store";
 import MobileCodeInput from "./pages/Mobile/mobileCodeInput";
+import { useEffect } from "react";
 
 const queryClient = new QueryClient();
 

@@ -24,6 +24,7 @@ const MobileCodeInput = () => {
     const [submited, setSubmited] = useState(false);
     const dispatch = useDispatch<AppDispatch>();
     const connectionStatus = useSelector((state: RootState) => state.appState.connectionStatus);
+    const gamePhase = useSelector((state: RootState) => state.appState.gamePhase);
     const socket = useWebSocket(submited ? code : "", submited ? nameState : "");
 
     useEffect(() => {
@@ -49,15 +50,15 @@ const MobileCodeInput = () => {
                 dispatch(setConnectionStatus("connected"));
                 toast.message("Connected to the Screen. Let's play");
             } else {
-                setSubmited(false);
+                // setSubmited(false);
                 toast.error("Failed to connect to server");
                 console.error("Failed to connect to server");
             }
         }
     }, [socket, dispatch, code, nameState, submited])
 
-    if (connectionStatus === "connected") {
-        return <CommanRemote />
+    if (connectionStatus === "connected" && gamePhase === "lobby") {
+        return <CommanRemote socket={socket} />
     }
 
     return (
