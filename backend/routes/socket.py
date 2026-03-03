@@ -24,4 +24,8 @@ async def websocket_room(websocket: WebSocket, room_id: str, name: str):
         await manager.disconnect(room_id, websocket)
         print("Unexpected error:", e)
 
-
+@router.websocket("/ws/test")
+async def test_socket(websocket: WebSocket):
+    await websocket.accept()
+    await websocket.send_text("connected")
+    await websocket.close()
