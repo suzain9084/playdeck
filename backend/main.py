@@ -24,3 +24,14 @@ app.add_middleware(
 @app.get("/")
 def home():
     return {"message": "Welcome to the application"}
+
+@app.get("/routes")
+def show_routes():
+    out = []
+    for r in app.routes:
+        out.append({
+            "path": getattr(r, "path", None),
+            "name": getattr(r, "name", None),
+            "type": r.__class__.__name__,
+        })
+    return out
