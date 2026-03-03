@@ -61,7 +61,7 @@ export const useWebSocket = (roomId, name) => {
               isHost: data.socket_id === data.host_socket_id,
             }),
           );
-          toast.message(`${name} is connected with Screen`);
+          toast.message(`${data.name} is connected with Screen`);
         }
       } else if (data.event === "disconnect") {
         dispatch(removePlayer(data.socket_id));
@@ -138,7 +138,7 @@ export const handleKeyDown = (
     }
 
     if (direction === "left") {
-        newCol = Math.max(selectedCol - 1, 2);
+        newCol = Math.max(selectedCol - 1, 0);
     }
     newCol = Math.min(newCol, rowLengths[newRow] - 1);
     dispatch(setSelectedRow(newRow));

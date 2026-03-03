@@ -26,11 +26,11 @@ const GameHeader = () => {
         {/* Right side controls */}
         <div className="flex items-center gap-3">
           {/* User avatar placeholder */}
-          <AvatarGroup className="grayscale">
+          <AvatarGroup >
             {players.map((item) => {
               const initials = getInitials(item.name);
               const bgColor = stringToColor(item.name);
-
+              console.log(item.name, bgColor);
               return (
                 <Avatar key={item.name} className="h-9 w-9">
                   <AvatarImage src=""> </AvatarImage>

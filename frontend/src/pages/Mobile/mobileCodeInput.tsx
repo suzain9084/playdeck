@@ -45,8 +45,8 @@ const MobileCodeInput = () => {
     useEffect(() => {
         if (submited) {
             if (socket.current) {
-                dispatch(setRoomId(code));
-                dispatch(setName(nameState));
+                dispatch(setRoomId(code.trim()));
+                dispatch(setName(nameState.trim()));
                 dispatch(setConnectionStatus("connected"));
                 toast.message("Connected to the Screen. Let's play");
             } else {
