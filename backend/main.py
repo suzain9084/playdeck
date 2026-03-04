@@ -9,7 +9,8 @@ app.include_router(socket.router)
 
 origins = [
     "http://localhost:8080",
-    "https://playdeck-beta.vercel.app/",
+    "https://playdeck-beta.vercel.app",
+    "http://localhost:4173",
 ]
 
 app.add_middleware(

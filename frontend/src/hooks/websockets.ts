@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { rowLengths } from "@/constant/gameListArray";
+import { isProduction } from "@/lib/utils";
 
 export const useWebSocket = (roomId, name) => {
   const wsRef = useRef(null);
@@ -98,7 +99,8 @@ export const useWebSocket = (roomId, name) => {
     if (!roomId || !name) return;
     let ws: WebSocket;
     try {
-      ws = new WebSocket(`ws://localhost:8000/ws/${roomId}/${name}`);
+      const connectionURL = `${isProduction() ? "wss://playdeck-1.onrender.com" : "ws://localhost:8000"}/ws/${roomId}/${name}`
+      ws = new WebSocket(connectionURL);
       wsRef.current = ws;
       ws.onopen = (data) => console.log("connected");
       ws.onclose = (data) => console.log("Disconnected: ", data);

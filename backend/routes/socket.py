@@ -17,7 +17,7 @@ async def websocket_room(websocket: WebSocket, room_id: str, name: str):
             await manager.read_message_reply(data)
 
     except WebSocketDisconnect:
-        await manager.disconnect(room_id, websocket)
+        manager.disconnect(room_id, websocket)
         await manager.broadcast(room_id, {"event": "disconnect", "socket_id": socket_id, "name": name})
 
     except Exception as e:

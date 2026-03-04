@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import logo from "/logo.png"
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Play, Volume2 } from 'lucide-react';
 import { getInitials } from '@/lib/utils';
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 
 const CommanRemote = ({ socket }) => {
     const name = useSelector((state: RootState) => state.appState.name);
@@ -12,15 +12,7 @@ const CommanRemote = ({ socket }) => {
     const host = useSelector((state: RootState) =>
         state.appState.players.filter((item) => item.name === name)
     )[0];
-    const players = useSelector((state: RootState) => state.appState.players);
     const ishost = host?.isHost;
-
-    useEffect(() => {
-        console.log("Name:", name);
-        console.log("Host:", host);
-        console.log("Is Host:", ishost);
-        console.log(players);
-    }, [name, host, ishost, players]);
 
     const sendEventToScoket = useCallback((direction: string) => {
         if (socket.current) {

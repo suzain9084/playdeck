@@ -5,7 +5,7 @@ import { Maximize, Minimize } from 'lucide-react';
 import soundFile from '@/assets/entry_sound.mp3';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/lib/store';
-import { toggleFullScreen } from '@/lib/utils';
+import { isProduction, toggleFullScreen } from '@/lib/utils';
 import { setRoomId } from '@/lib/appState';
 import { toast } from 'sonner';
 import { useWebSocket } from '@/hooks/websockets';
@@ -21,7 +21,8 @@ const PlayGame = () => {
     const fetch_room_id_code = useCallback(async () => {
         if (roomId.trim() === "") {
             try {
-                const res = await fetch("http://localhost:8000/get_room_id");
+                const requestURL = `http://${isProduction() ? "playdeck-1.onrender.com" : "localhost:8000"}/get_room_id`;
+                const res = await fetch(requestURL);
                 if (res.ok) {
                     const data = await res.json();
                     if (data && data.room_id) {
@@ -56,7 +57,7 @@ const PlayGame = () => {
     }, [socket]);
 
     if (players.length !== 0) {
-        return <GameList/>
+        return <GameList />
     }
 
     return (
