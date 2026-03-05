@@ -21,7 +21,7 @@ const PlayGame = () => {
     const fetch_room_id_code = useCallback(async () => {
         if (roomId.trim() === "") {
             try {
-                const requestURL = `http://${isProduction() ? "playdeck-1.onrender.com" : "localhost:8000"}/get_room_id`;
+                const requestURL = `${isProduction() ? "https://playdeck-1.onrender.com" : "http://localhost:8000"}/get_room_id`;
                 const res = await fetch(requestURL);
                 if (res.ok) {
                     const data = await res.json();
