@@ -2,13 +2,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Check, X } from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import CommanRemote from "./commanRemote";
 import { toast } from "sonner";
 import { useWebSocket } from "@/hooks/websockets";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/lib/store";
 import { setConnectionStatus, setName, setRoomId } from "@/lib/appState";
+import { Loader } from 'lucide-react'
+import { toggleFullScreen } from "@/lib/utils";
+
 
 const steps = [
     "Connect all the devices to the same WiFi",
@@ -21,6 +24,7 @@ const MobileCodeInput = () => {
     const [code, setCode] = useState("");
     const navigate = useNavigate();
     const [nameState, setNameState] = useState("");
+    const [searchParams] = useSearchParams();
     const [submited, setSubmited] = useState(false);
     const dispatch = useDispatch<AppDispatch>();
     const connectionStatus = useSelector((state: RootState) => state.appState.connectionStatus);
@@ -33,14 +37,29 @@ const MobileCodeInput = () => {
         }
     }, [currentStep, navigate, connectionStatus]);
 
+    useEffect(() => {
+            toggleFullScreen(dispatch);  
+    }, [dispatch]);
+
     const clearCode = () => setCode("");
     const submitCode = useCallback(() => {
         if (nameState.trim() === "" || code.trim() === "") {
             toast.error("Please enter a name and code");
             return;
         }
+        dispatch(setConnectionStatus("connecting"));
         setSubmited(true);
-    }, [code, nameState]);
+    }, [code, nameState, dispatch]);
+
+    useEffect(() => {
+        console.log("Searchparam", searchParams)
+        console.log("Searchparam roomid", searchParams.get("roomid"))
+        const roomIdFromUrl = searchParams.get("roomid");
+        if (roomIdFromUrl) {
+            setCode(roomIdFromUrl);
+            setCurrentStep(1);
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         if (submited) {
@@ -113,21 +132,25 @@ const MobileCodeInput = () => {
                 </div>
 
                 {/* Keypad Grid */}
-                <div className="absolute bottom-2 flex justify-between w-full px-4">
-                    {/* Clear Button */}
-                    <button
-                        onClick={clearCode}
-                        className="w-20 h-20 rounded-full bg-gray-800 flex items-center justify-center shadow-lg active:scale-95 transition-all"
-                    >
-                        <X className="w-8 h-8 text-red-500 stroke-[3px]" />
-                    </button>
-                    {/* Confirm Button */}
-                    <button
+                <div className="absolute bottom-4 flex justify-center w-full px-4">
+                    <Button
+                        variant="hero"
+                        size="xl"
+                        className="w-full max-w-md"
                         onClick={submitCode}
-                        className="w-20 h-20 rounded-full bg-gray-800 flex items-center justify-center shadow-lg active:scale-95 transition-all"
+                        disabled={connectionStatus === "connecting"}
                     >
-                        <Check className="w-10 h-10 text-green-500 stroke-[3px]" />
-                    </button>
+                        {connectionStatus === "connecting" ? (
+                            <>
+                                <Loader className="w-5 h-5 mr-2 animate-spin" />
+                                Connecting...
+                            </>
+                        ) : (
+                            <>
+                                Let's Play
+                            </>
+                        )}
+                    </Button>
                 </div>
             </div>}
         </div>

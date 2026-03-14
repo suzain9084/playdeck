@@ -10,6 +10,7 @@ import { setRoomId } from '@/lib/appState';
 import { toast } from 'sonner';
 import { useWebSocket } from '@/hooks/websockets';
 import GameList from './GameList';
+import { Loader } from 'lucide-react'
 
 const PlayGame = () => {
     const roomId = useSelector((state: RootState) => state.appState.roomId);
@@ -71,10 +72,10 @@ const PlayGame = () => {
                 </div>
 
                 <div className="flex items-center space-x-6">
-                    <div className="bg-black border-2 border-blue-600/50 rounded-sm px-3 py-1 flex items-center space-x-6 shadow-[0_0_40px_rgba(37,99,235,0.2)]">
+                    {roomId && <div className="bg-black border-2 border-blue-600/50 rounded-sm px-3 py-1 flex items-center space-x-6 shadow-[0_0_40px_rgba(37,99,235,0.2)]">
                         <span className="text-green-400 text-[1.2rem]">🎫</span>
                         <span className="font-mono text-[1.2rem] font-bold tracking-widest">{roomId}</span>
-                    </div>
+                    </div>}
                     <button className="p-2 hover:bg-white/10 rounded-full transition-colors"
                         onClick={() => toggleFullScreen(dispatch)}>
                         {!isFullScreen ? <Minimize className="w-6 h-6 text-gray-400" /> : <Maximize className="w-6 h-6 text-gray-400" />}
@@ -128,12 +129,23 @@ const PlayGame = () => {
                             and <span className="text-blue-400 font-bold uppercase tracking-tighter">enter the code</span> below:
                         </p>
                     </div>
+                    <div className="bg-black border-2 border-blue-600/50 rounded-xl px-6 py-3 mb-6 flex items-center space-x-4 shadow-[0_0_40px_rgba(37,99,235,0.2)]">
+                        {roomId ? (
+                            <>
+                                <span className="text-2xl">🎫</span>
+                                <span className="font-mono text-[1.5rem] font-bold tracking-widest">
+                                    {roomId}
+                                </span>
+                            </>
+                        ) : (
+                            <>
+                                <Loader className="w-6 h-6 text-blue-400 animate-spin" />
+                                <span className="font-mono text-[1.5rem] font-bold tracking-widest text-gray-400">
+                                    Loading...
+                                </span>
+                            </>
+                        )}
 
-                    <div className="bg-black border-2 border-blue-600/50 rounded-xl px-6 py-3 mb-6 flex items-center space-x-6 shadow-[0_0_40px_rgba(37,99,235,0.2)]">
-                        <span className="text-2xl">🎫</span>
-                        <span className="text-2xl font-black tracking-[0.2em] text-white tabular-nums">
-                            {roomId}
-                        </span>
                     </div>
 
                     <div className="w-full flex items-center justify-center space-x-4 mb-8">
@@ -142,13 +154,20 @@ const PlayGame = () => {
                         <div className="h-px bg-white/10 flex-1"></div>
                     </div>
 
-                    <div className="bg-white p-3 rounded-[1rem] shadow-2xl transition-transform hover:scale-105 duration-300">
-                        {roomId && <QRCodeSVG
-                            value={`https://playdeck-beta.vercel.app/playgames?roomid=${roomId}`}
-                            size={160}
-                            level={"H"}
-                            includeMargin={false}
-                        />}
+                    <div className="bg-white p-3 rounded-[1rem] shadow-2xl transition-transform hover:scale-105 duration-300 justify-center items-center flex relative">
+                        <div className={!roomId ? "blur-sm opacity-40" : ""}>
+                            <QRCodeSVG
+                                value={`https://playdeck-beta.vercel.app/playgames${roomId ? `?roomid=${roomId}` : ""}`}
+                                size={160}
+                                level={"H"}
+                                includeMargin={false}
+                            />
+                        </div>
+                        {!roomId && (
+                            <div className="absolute flex flex-col items-center">
+                                <Loader className="w-10 h-10 text-black animate-spin" />
+                            </div>
+                        )}
                     </div>
                 </div>
             </main>
