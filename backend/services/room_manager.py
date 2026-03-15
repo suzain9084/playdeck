@@ -38,23 +38,24 @@ class RoomManager:
     async def connect(self, room_id: str, websocket: WebSocket, name: str, socket_id: str):
         await websocket.accept()
 
-        if room_id not in self.rooms:
+        if room_id not in self.rooms and name == "screen":
             room = Room(room_id)
             member = Member(name="screen", websocket=websocket, socket_id=socket_id)
             room.screen = member
             room.members.append(member)
             self.rooms[room_id] = room
 
-        elif len(self.rooms[room_id].members) == 1:
+        elif room_id in self.rooms and name != "screen":
             room = self.rooms[room_id]
             member = Member(name=name, websocket=websocket, socket_id=socket_id)
-            room.host = member
+            if len(room.members) == 1:
+                room.host = member
             room.members.append(member)
-
         else:
-            room = self.rooms[room_id]
-            member = Member(name=name, websocket=websocket, socket_id=socket_id)
-            room.members.append(member)
+            await websocket.close(code=1008)
+            return False
+        self.connectBroadcast(room_id, name, socket_id)
+        return True
 
     def disconnect(self, room_id: str, websocket: WebSocket):
         if room_id not in self.rooms:

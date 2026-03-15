@@ -26,8 +26,12 @@ export const useWebSocket = (roomId, name) => {
   const playerCount = useSelector(
     (state: RootState) => state.appState.players,
   ).length;
-  const selectedRow = useSelector((state: RootState) => state.appState.selectedRow);
-  const selectedCol = useSelector((state: RootState) => state.appState.selectedCol);
+  const selectedRow = useSelector(
+    (state: RootState) => state.appState.selectedRow,
+  );
+  const selectedCol = useSelector(
+    (state: RootState) => state.appState.selectedCol,
+  );
   const navigate = useNavigate();
   const playerCountRef = useRef(playerCount);
   const selectedRowRef = useRef(selectedRow);
@@ -37,7 +41,8 @@ export const useWebSocket = (roomId, name) => {
   useEffect(() => {
     playerCountRef.current = playerCount;
     selectedRowRef.current = selectedRow;
-    selectedColRef .current = selectedCol;
+    selectedColRef.current = selectedCol;
+    console.log("players: ", appState.players);
   }, [playerCount, selectedRow, selectedCol, appState]);
 
   const handleMessage = useCallback(
@@ -49,7 +54,6 @@ export const useWebSocket = (roomId, name) => {
           dispatch(setSocketId(event.socket_id));
           dispatch(setScreenId(event.socket_id));
           dispatch(setRole("screen"));
-          dispatch(setConnectionStatus("connected"));
           dispatch(setGamePhase("starting"));
           toast.message("Screen Connect with Server.");
         } else if (event.name !== name) {
@@ -70,7 +74,7 @@ export const useWebSocket = (roomId, name) => {
           navigate("/");
         }
       } else if (data.event === "room_state") {
-        dispatch(setConnectionStatus("connected"));
+        toast.message("Connected to the Screen. Let's play");
         dispatch(setGamePhase("lobby"));
         const players: Player[] = [];
         for (const player of data.members) {
@@ -89,21 +93,41 @@ export const useWebSocket = (roomId, name) => {
         dispatch(setSocketId(data.host_socket_id));
         dispatch(setPlayers(players));
       } else if (data.event === "button_press") {
-        handleKeyDown(data.action, dispatch, selectedRowRef.current, selectedColRef.current);
+        handleKeyDown(
+          data.action,
+          dispatch,
+          selectedRowRef.current,
+          selectedColRef.current,
+        );
       }
     },
     [dispatch, name, navigate],
   );
 
+  const handleConnectionOpen = (data) => {
+    console.log(data);
+    dispatch(setConnectionStatus("connected"));
+  };
+
+  const handleOnclose = (data) => {
+    if (data.code === 1008) {
+      toast.message(data.reason || "Code does not exist for screen");
+      navigate("/");
+    } else if (data.code === 1006) {
+      toast.message("Connection failed");
+      navigate("/");
+    }
+  };
+
   useEffect(() => {
     if (!roomId || !name) return;
     let ws: WebSocket;
     try {
-      const connectionURL = `${isProduction() ? "wss://playdeck-1.onrender.com" : "ws://localhost:8000"}/ws/${roomId}/${name}`
+      const connectionURL = `${isProduction() ? "wss://playdeck-1.onrender.com" : "ws://localhost:8000"}/ws/${roomId}/${name}`;
       ws = new WebSocket(connectionURL);
       wsRef.current = ws;
-      ws.onopen = (data) => console.log("connected");
-      ws.onclose = (data) => console.log("Disconnected: ", data);
+      ws.onopen = (data) => handleConnectionOpen(data);
+      ws.onclose = (data) => handleOnclose(data);
       ws.onmessage = (event) => handleMessage(event);
       ws.onerror = (err) => console.error(err);
     } catch (error) {
@@ -119,30 +143,30 @@ export const useWebSocket = (roomId, name) => {
 };
 
 export const handleKeyDown = (
-    direction,
-    dispatch,
-    selectedRow,
-    selectedCol
+  direction,
+  dispatch,
+  selectedRow,
+  selectedCol,
 ) => {
-    let newRow = selectedRow;
-    let newCol = selectedCol;
+  let newRow = selectedRow;
+  let newCol = selectedCol;
 
-    if (direction === "down") {
-        newRow = Math.min(selectedRow + 1, 3);
-    }
+  if (direction === "down") {
+    newRow = Math.min(selectedRow + 1, 3);
+  }
 
-    if (direction === "up") {
-        newRow = Math.max(selectedRow - 1, 0);
-    }
+  if (direction === "up") {
+    newRow = Math.max(selectedRow - 1, 0);
+  }
 
-    if (direction === "right") {
-        newCol = (selectedCol + 1) % rowLengths[newRow];
-    }
+  if (direction === "right") {
+    newCol = (selectedCol + 1) % rowLengths[newRow];
+  }
 
-    if (direction === "left") {
-        newCol = Math.max(selectedCol - 1, 0);
-    }
-    newCol = Math.min(newCol, rowLengths[newRow] - 1);
-    dispatch(setSelectedRow(newRow));
-    dispatch(setSelectedCol(newCol));
+  if (direction === "left") {
+    newCol = Math.max(selectedCol - 1, 0);
+  }
+  newCol = Math.min(newCol, rowLengths[newRow] - 1);
+  dispatch(setSelectedRow(newRow));
+  dispatch(setSelectedCol(newCol));
 };

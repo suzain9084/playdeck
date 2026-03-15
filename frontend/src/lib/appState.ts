@@ -87,7 +87,7 @@ export const AppStateSlice = createSlice({
 
     removePlayer: (state, action) => {
       state.players = state.players.filter(
-        (p) => p.socketId === action.payload,
+        (p) => p.socketId !== action.payload,
       );
     },
 
