@@ -42,8 +42,7 @@ export const useWebSocket = (roomId, name) => {
     playerCountRef.current = playerCount;
     selectedRowRef.current = selectedRow;
     selectedColRef.current = selectedCol;
-    console.log("players: ", appState.players);
-  }, [playerCount, selectedRow, selectedCol, appState]);
+  }, [playerCount, selectedRow, selectedCol]);
 
   const handleMessage = useCallback(
     (event) => {
@@ -105,7 +104,6 @@ export const useWebSocket = (roomId, name) => {
   );
 
   const handleConnectionOpen = (data) => {
-    console.log(data);
     dispatch(setConnectionStatus("connected"));
   };
 

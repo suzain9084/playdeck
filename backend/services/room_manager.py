@@ -54,7 +54,6 @@ class RoomManager:
         else:
             await websocket.close(code=1008)
             return False
-        self.connectBroadcast(room_id, name, socket_id)
         return True
 
     def disconnect(self, room_id: str, websocket: WebSocket):

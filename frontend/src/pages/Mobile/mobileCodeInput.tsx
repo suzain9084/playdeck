@@ -53,8 +53,6 @@ const MobileCodeInput = () => {
   }, [code, nameState, dispatch]);
 
   useEffect(() => {
-    console.log("Searchparam", searchParams);
-    console.log("Searchparam roomid", searchParams.get("roomid"));
     const roomIdFromUrl = searchParams.get("roomid");
     if (roomIdFromUrl) {
       setCode(roomIdFromUrl);
