@@ -98,15 +98,9 @@ class RoomManager:
 
     async def read_message_reply(self, data):
         data = json.loads(data)
-        if data["event"] == "button_press":
-            msg_from = data["from"]
-            msg_to = data["to"]
-            action = data["action"]
-            room_id = data["room_id"]
-            for member in self.rooms[room_id].members:
-                if msg_to == member.socket_id:
-                    await member.websocket.send_json({"event": data["event"], "from": msg_from, "action": action})
-                    break
+        room_id = data["room_id"]
+        for member in self.rooms[room_id].members:
+            await member.websocket.send_json(data)
 
     async def broadcast(self, room_id, message):
         if room_id not in self.rooms.keys():
