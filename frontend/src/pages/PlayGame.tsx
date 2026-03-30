@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { Suspense, useCallback, useEffect } from "react";
 import logo from "/favicon.svg";
 import { QRCodeSVG } from "qrcode.react";
 import { Maximize, Minimize } from "lucide-react";
@@ -12,7 +12,7 @@ import { useWebSocket } from "@/hooks/websockets";
 import GameList from "./GameList";
 import { Loader } from "lucide-react";
 import leftImage from "@/assets/left_panel.jpg";
-import { useNavigate } from "react-router-dom";
+import { gameMap } from "@/constant/gameComponentMap";
 
 const PlayGame = () => {
   const roomId = useSelector((state: RootState) => state.appState.roomId);
@@ -22,7 +22,7 @@ const PlayGame = () => {
   );
   const socket = useWebSocket(roomId, "screen");
   const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
+  const playingGame = useSelector((state: RootState) => state.appState.playingGame);
 
   const fetch_room_id_code = useCallback(async () => {
     if (roomId.trim() === "") {
@@ -54,8 +54,16 @@ const PlayGame = () => {
     audio.play();
   }, [dispatch]);
 
-  if (players.length !== 0) {
+  if (players.length !== 0 && playingGame === "") {
     return <GameList />;
+  } else if (players.length !== 0 && playingGame !== "") {
+    const Game = gameMap[playingGame.toLowerCase().replace(" ", "_")]?.game;
+    if (!Game) return <GameList />;
+    return (
+      <Suspense fallback={<p>Game is Loading</p>}>
+        <Game socket={socket}/>
+      </Suspense>
+    );
   }
 
   return (

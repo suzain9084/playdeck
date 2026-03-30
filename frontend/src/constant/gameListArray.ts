@@ -6,17 +6,19 @@ import game5 from "@/assets/game-5.jpg";
 import game6 from "@/assets/game-6.jpg";
 import game7 from "@/assets/game-7.jpg";
 import game8 from "@/assets/game-8.jpg";
+import snake from "@/assets/snake.avif"
 
 export const hotAndFreeGames = [
-    { id: "1", title: "Kart Racing", image: game1 },
-    { id: "2", title: "Party Fiesta", image: game2 },
-    { id: "3", title: "Let's Cook Together", image: game3 },
-    { id: "4", title: "Quiz Mania", image: game4 },
-    { id: "5", title: "Drawing Party", image: game5 },
-    { id: "6", title: "Castle Defense", image: game6 },
-    { id: "7", title: "Golazo Soccer", image: game7 },
-    { id: "8", title: "Monster Party", image: game8 },
-    { id: "8", title: "Monster Party", image: game8 },
+    { id: "1", title: "Snake Grid", image: snake },
+    { id: "2", title: "Kart Racing", image: game1 },
+    { id: "3", title: "Party Fiesta", image: game2 },
+    { id: "4", title: "Let's Cook Together", image: game3 },
+    { id: "5", title: "Quiz Mania", image: game4 },
+    { id: "6", title: "Drawing Party", image: game5 },
+    { id: "7", title: "Castle Defense", image: game6 },
+    { id: "8", title: "Golazo Soccer", image: game7 },
+    { id: "9", title: "Monster Party", image: game8 },
+    { id: "10", title: "Monster Party", image: game8 },
 ];
 
 export const newGames = [
@@ -60,4 +62,11 @@ export const rowLengths = [
     newGames.length,
     topCharts.length,
     familyGames.length,
+]
+
+export const gameInfo = [
+    hotAndFreeGames,
+    newGames,
+    topCharts,
+    familyGames,
 ]

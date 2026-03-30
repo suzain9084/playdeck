@@ -10,20 +10,18 @@ import {
   Volume2,
 } from "lucide-react";
 import { getInitials } from "@/lib/utils";
-import { useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { Suspense, useCallback } from "react";
+import { gameMap } from "@/constant/gameComponentMap";
 
 const CommanRemote = ({ socket }) => {
   const name = useSelector((state: RootState) => state.appState.name);
-  const screenSocket = useSelector(
-    (state: RootState) => state.appState.screenId,
-  );
   const roomId = useSelector((state: RootState) => state.appState.roomId);
   const host = useSelector((state: RootState) =>
     state.appState.players.filter((item) => item.name === name),
   )[0];
   const ishost = host?.isHost;
-  const navigate = useNavigate();
+  const playingGame = useSelector((state: RootState) => state.appState.playingGame);
+  const Remote = playingGame !== "" ? gameMap[playingGame.toLowerCase().replace(" ", "_")]?.controller : undefined;
 
   const sendEventToScoket = useCallback(
     (direction: string) => {
@@ -34,7 +32,6 @@ const CommanRemote = ({ socket }) => {
               from: host.socketId,
               event: "button_press",
               action: direction,
-              to: screenSocket,
               room_id: roomId,
             }),
           );
@@ -43,11 +40,12 @@ const CommanRemote = ({ socket }) => {
         }
       }
     },
-    [socket, host, screenSocket, roomId],
+    [socket, host, roomId],
   );
 
   return (
     <div className="h-screen w-full bg-background">
+      {playingGame === "" && <>
       <div className="relative h-[45%] w-full flex flex-col justify-center align-middle">
         <div className="w-full py-4 px-6 absolute top-0 border-border/40 bg-background/80 gradient-hero supports-[backdrop-filter]:bg-background/60 ">
           <div className="flex items-center justify-center space-x-3">
@@ -84,7 +82,7 @@ const CommanRemote = ({ socket }) => {
               </div>
               <div
                 className="h-32 w-32 bg-gray-700 rounded-full flex justify-center shadow-lg active:scale-95 transition-all"
-                onClick={() => sendEventToScoket("play")}
+                onClick={() => sendEventToScoket("select")}
               >
                 <Play className="text-white self-center" size={36} />
               </div>
@@ -112,6 +110,10 @@ const CommanRemote = ({ socket }) => {
           </div>
         )}
       </div>
+      </>}
+      <Suspense fallback={<div>Loading Game Assets...</div>}>
+        {Remote && <Remote socket={socket}/>}
+      </Suspense>
     </div>
   );
 };

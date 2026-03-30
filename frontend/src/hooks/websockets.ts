@@ -6,6 +6,7 @@ import {
   setGamePhase,
   setName,
   setPlayers,
+  setPlayingGame,
   setRole,
   setScreenId,
   setSelectedCol,
@@ -17,7 +18,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { rowLengths } from "@/constant/gameListArray";
+import { gameInfo, rowLengths } from "@/constant/gameListArray";
 import { isProduction } from "@/lib/utils";
 
 export const useWebSocket = (roomId, name) => {
@@ -32,17 +33,24 @@ export const useWebSocket = (roomId, name) => {
   const selectedCol = useSelector(
     (state: RootState) => state.appState.selectedCol,
   );
+  const playingGame = useSelector(
+    (state: RootState) => state.appState.playingGame,
+  );
+  const gamePhase = useSelector((state: RootState) => state.appState.gamePhase);
   const navigate = useNavigate();
   const playerCountRef = useRef(playerCount);
   const selectedRowRef = useRef(selectedRow);
   const selectedColRef = useRef(selectedCol);
-  const appState = useSelector((state: RootState) => state.appState);
+  const gamePhaseRef = useRef(gamePhase);
+  const playingGameRef = useRef(playingGame);
 
   useEffect(() => {
     playerCountRef.current = playerCount;
     selectedRowRef.current = selectedRow;
     selectedColRef.current = selectedCol;
-  }, [playerCount, selectedRow, selectedCol]);
+    gamePhaseRef.current = gamePhase;
+    playingGameRef.current = playingGame;
+  }, [playerCount, selectedRow, selectedCol, gamePhase, playingGame]);
 
   const handleMessage = useCallback(
     (event) => {
@@ -54,6 +62,7 @@ export const useWebSocket = (roomId, name) => {
           dispatch(setScreenId(event.socket_id));
           dispatch(setRole("screen"));
           dispatch(setGamePhase("starting"));
+          dispatch(setGamePhase("lobby"));
           toast.message("Screen Connect with Server.");
         } else if (event.name !== name) {
           dispatch(
@@ -70,6 +79,7 @@ export const useWebSocket = (roomId, name) => {
       } else if (data.event === "disconnect") {
         dispatch(removePlayer(data.socket_id));
         if (playerCountRef.current == 0) {
+          dispatch(setGamePhase("ended"));
           navigate("/");
         }
       } else if (data.event === "room_state") {
@@ -91,31 +101,44 @@ export const useWebSocket = (roomId, name) => {
         }
         dispatch(setSocketId(data.host_socket_id));
         dispatch(setPlayers(players));
-      } else if (data.event === "button_press") {
-        handleKeyDown(
-          data.action,
-          dispatch,
-          selectedRowRef.current,
-          selectedColRef.current,
-        );
+      } else {
+        const phase = gamePhaseRef.current;
+        if (phase === "lobby") {
+          handleKeyDown(
+            data,
+            dispatch,
+            selectedRowRef.current,
+            selectedColRef.current,
+          );
+        } else if (phase === "playing") {
+          console.log(data);
+          const gameEvent = new CustomEvent(`${playingGameRef.current.toLowerCase().replace(" ", "-")}/action`, {detail: data});
+          window.dispatchEvent(gameEvent);
+        }
       }
     },
     [dispatch, name, navigate],
   );
 
-  const handleConnectionOpen = (data) => {
-    dispatch(setConnectionStatus("connected"));
-  };
+  const handleConnectionOpen = useCallback(
+    (data) => {
+      dispatch(setConnectionStatus("connected"));
+    },
+    [dispatch],
+  );
 
-  const handleOnclose = (data) => {
-    if (data.code === 1008) {
-      toast.message(data.reason || "Code does not exist for screen");
-      navigate("/");
-    } else if (data.code === 1006) {
-      toast.message("Connection failed");
-      navigate("/");
-    }
-  };
+  const handleOnclose = useCallback(
+    (data) => {
+      if (data.code === 1008) {
+        toast.message(data.reason || "Code does not exist for screen");
+        navigate("/");
+      } else if (data.code === 1006) {
+        toast.message("Connection failed");
+        navigate("/");
+      }
+    },
+    [navigate],
+  );
 
   useEffect(() => {
     if (!roomId || !name) return;
@@ -135,33 +158,33 @@ export const useWebSocket = (roomId, name) => {
     return () => {
       ws.close();
     };
-  }, [roomId, handleMessage, name]);
+  }, [
+    roomId,
+    handleMessage,
+    name,
+    handleConnectionOpen,
+    handleOnclose,
+    dispatch,
+  ]);
 
   return wsRef;
 };
 
-export const handleKeyDown = (
-  direction,
-  dispatch,
-  selectedRow,
-  selectedCol,
-) => {
+export const handleKeyDown = (action, dispatch, selectedRow, selectedCol) => {
   let newRow = selectedRow;
   let newCol = selectedCol;
 
-  if (direction === "down") {
+  if (action?.action === "select") {
+    dispatch(setGamePhase("playing"));
+    dispatch(setPlayingGame(gameInfo[newRow][newCol].title));
+    return;
+  } else if (action?.action === "down") {
     newRow = Math.min(selectedRow + 1, 3);
-  }
-
-  if (direction === "up") {
+  } else if (action?.action === "up") {
     newRow = Math.max(selectedRow - 1, 0);
-  }
-
-  if (direction === "right") {
+  } else if (action?.action === "right") {
     newCol = (selectedCol + 1) % rowLengths[newRow];
-  }
-
-  if (direction === "left") {
+  } else if (action?.action === "left") {
     newCol = Math.max(selectedCol - 1, 0);
   }
   newCol = Math.min(newCol, rowLengths[newRow] - 1);

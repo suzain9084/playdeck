@@ -72,7 +72,7 @@ const MobileCodeInput = () => {
     }
   }, [socket, dispatch, code, nameState, submited]);
 
-  if (connectionStatus === "connected" && gamePhase === "lobby") {
+  if (connectionStatus === "connected" && (gamePhase === "lobby" || gamePhase === "playing")) {
     return <CommanRemote socket={socket} />;
   }
 

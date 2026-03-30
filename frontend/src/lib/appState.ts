@@ -27,6 +27,7 @@ export interface AppStateType {
   gamePhase: GamePhase;
   selectedRow: number;
   selectedCol: number;
+  playingGame: string;
 }
 
 export const AppStateSlice = createSlice({
@@ -43,6 +44,7 @@ export const AppStateSlice = createSlice({
     gamePhase: "lobby",
     selectedCol: 0,
     selectedRow: 0,
+    playingGame: "",
   } as AppStateType,
   reducers: {
     setIsMobile: (state, action) => {
@@ -102,6 +104,10 @@ export const AppStateSlice = createSlice({
     setSelectedCol: (state, action) => {
       state.selectedCol = action.payload;
     },
+
+    setPlayingGame: (state, action) => {
+      state.playingGame = action.payload;
+    },
   },
 });
 
@@ -120,5 +126,6 @@ export const {
   setScreenId,
   setSelectedCol,
   setSelectedRow,
+  setPlayingGame,
 } = AppStateSlice.actions;
 export default AppStateSlice.reducer;
